@@ -21,28 +21,35 @@ public class Report {
      * @effect : write to a html file present all enrol of a student.
      */
     public boolean myEnrols(int studentId){
-        String sql = "SELECT* FROM Enrolment WHERE student = "+studentId+";" ;
-        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("my_enrols.html"))){
-            bufferedWriter.write(app.selectToHtml(sql));
-            return true;
-        }catch (IOException ex){
-            ex.printStackTrace();
-            return false;
+        if (StudentsManager.isExistStudent(studentId,app)){
+            String sql = "SELECT* FROM Enrolment WHERE student = "+studentId+";" ;
+            try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("my_enrols.html"))){
+                bufferedWriter.write(app.selectToHtml(sql));
+                return true;
+            }catch (IOException ex){
+                ex.printStackTrace();
+                return false;
+            }
         }
+        return false;
+
     }
 
     /**
      * @effect : write to a html file represent all student of a course.
      */
     public boolean courseEnrol(String courseId){
-        String sql = "SELECT* FROM Enrolment WHERE course = '"+courseId+"';";
-        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("course_enrols.html"))){
-            bufferedWriter.write(app.selectToHtml(sql));
-            return true;
-        }catch (IOException ex){
-            ex.printStackTrace();
-            return false;
+        if (CoursesManager.isExistCourse(courseId,app)){
+            String sql = "SELECT* FROM Enrolment WHERE course = '"+courseId+"';";
+            try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("course_enrols.html"))){
+                bufferedWriter.write(app.selectToHtml(sql));
+                return true;
+            }catch (IOException ex){
+                ex.printStackTrace();
+                return false;
+            }
         }
+        return false;
     }
 
     /**

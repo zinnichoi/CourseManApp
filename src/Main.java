@@ -23,7 +23,7 @@ public class Main {
             if (app.connect(dbName,userName,password)){
                 break;
             }else {
-                System.out.println("invalid input : ");
+                System.out.println("invalid input rewrite, please ! ");
             }
         }
 
@@ -69,7 +69,6 @@ public class Main {
                                     System.out.println("Add complete !");
                                 } else {
                                     System.out.println("Can not add !");
-                                    System.out.println("Student id existed !");
                                 }
 
                                 break;
@@ -80,7 +79,7 @@ public class Main {
                                 System.out.println("Enter student id : ");
                                 int studentID = input.nextInt();
                                 input.nextLine();
-                                if (studentsManager.isExistStudent(studentID)) {
+                                if (studentsManager.isExistStudent(studentID,app)) {
                                     System.out.println("Student information :");
                                     System.out.println(studentsManager.studentToString(studentID));
                                     System.out.println("enter information want to edit, rewrite info dont want edit");
@@ -99,7 +98,7 @@ public class Main {
                                         System.out.println("Infomation input is not valid : ");
                                     }
                                 } else {
-                                    System.out.println("Student with id :" + studentID + " is not exist !");
+                                    System.out.println("Can not edit !");
                                 }
 
                                 break;
@@ -113,7 +112,7 @@ public class Main {
                                 if (studentsManager.deleteStudent(studentID)) {
                                     System.out.println("Delete complete !");
                                 } else {
-                                    System.out.println("Student with id :" + studentID + " is not exist !");
+                                    System.out.println("Can not delete ! ");
                                 }
 
                                 break;
@@ -159,9 +158,7 @@ public class Main {
                                     System.out.println("Add complete !");
                                 } else {
                                     System.out.println("Can not add !");
-                                    System.out.println("Course with id :" + courseId + " existed !");
                                 }
-
                                 break;
                             }
 
@@ -170,7 +167,7 @@ public class Main {
                                 System.out.println("Enter course id :");
                                 String courseId = input.nextLine();
 
-                                if (coursesManager.isExistCourse(courseId)) {
+                                if (coursesManager.isExistCourse(courseId,app)) {
                                     System.out.println("Course information");
                                     System.out.println(coursesManager.courseToString(courseId));
                                     System.out.println("enter information want to edit, rewrite info dont want edit");
@@ -185,7 +182,7 @@ public class Main {
                                         System.out.println("input is not valid : ");
                                     }
                                 } else {
-                                    System.out.println("Course with id :" + courseId + " is not exist !");
+                                    System.out.println("Can not edit ! ");
                                 }
 
                                 break;
@@ -200,7 +197,6 @@ public class Main {
                                     System.out.println("Delete course complete !");
                                 } else {
                                     System.out.println("can not delete : ");
-                                    System.out.println("Course with id :" + courseId + " is not exist !");
                                 }
 
                                 break;
@@ -249,7 +245,7 @@ public class Main {
                                 if (enrolmentManager.addEnrolment(studentID, courseID, semester, finalGrade)) {
                                     System.out.println("add enrolment complete ! ");
                                 } else {
-                                    System.out.println("Infomation input is not valid :");
+                                    System.out.println("can not add !");
                                 }
 
                                 break;
@@ -273,9 +269,10 @@ public class Main {
                                         System.out.println("Update final grade complete !");
                                     } else {
                                         System.out.println("Infomation input is not valid :");
+                                        System.out.println("Can not edit ! ");
                                     }
                                 } else {
-                                    System.out.println("Enrolment with studentId :" + studentID + " , courseID : " + courseID + " is not exist !");
+                                    System.out.println("Can not edit ! ");
                                 }
 
                                 break;
@@ -322,32 +319,23 @@ public class Main {
                                 System.out.println("enter student id : ");
                                 int studentID = input.nextInt();
                                 input.nextLine();
-                                if (enrolmentManager.isExistStudent(studentID)) {
-                                    if (report.myEnrols(studentID)) {
-                                        System.out.println("Write to my_enrols.html complete !");
-                                    } else {
-                                        System.out.println("Can not write to my_enrols.html !");
-                                    }
+                                if (report.myEnrols(studentID)) {
+                                    System.out.println("Write to my_enrols.html complete !");
                                 } else {
-                                    System.out.println("Enrolment with studentid :" + studentID + " is not exist !");
+                                    System.out.println("Can not write to my_enrols.html !");
                                 }
-                                break;
+                            break;
                             }
 
                             // Display all students of a given course.
                             case 2: {
                                 System.out.println("enter course id : ");
                                 String courseID = input.nextLine();
-                                input.nextLine();
-                                if (enrolmentManager.isExistCourse(courseID)) {
                                     if (report.courseEnrol(courseID)) {
                                         System.out.println("Write to course_enrols.html complete !");
                                     } else {
                                         System.out.println("Can not write to course_enrols.html !");
                                     }
-                                } else {
-                                    System.out.println("Enrolment with courseId :" + courseID + " is not exist !");
-                                }
                                 break;
                             }
 

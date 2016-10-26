@@ -29,10 +29,13 @@ public class StudentsManager {
      * return false
      */
     public boolean addStudent(int studentID, String firstName, String lastName, String address, String dob) {
-        if (isValidFirstName(firstName) && isValidLastName(lastName) && isValidAddress(address) && isValidDateOfBirth(dob)) {
-            if (!isExistStudent(studentID)) {
+        if (isValidStudentId(studentID) && isValidFirstName(firstName) && isValidLastName(lastName) && isValidAddress(address) && isValidDateOfBirth(dob)) {
+            if (!isExistStudent(studentID,app)) {
                 String sql = String.format("INSERT INTO Student VALUES (%d,'%s','%s','%s','%s');", studentID, firstName, lastName, address, dob);
                 return app.insert(sql);
+            } else {
+                System.err.println("Student id existed !");
+                return false;
             }
         }
         return false;
@@ -65,7 +68,7 @@ public class StudentsManager {
      * return false
      */
     public boolean deleteStudent(int studentId) {
-        if (isExistStudent(studentId)) {
+        if (isExistStudent(studentId,app)) {
             String sql = String.format("DELETE FROM Student WHERE studentid = %d;", studentId);
             return app.delete(sql);
         }
@@ -102,9 +105,13 @@ public class StudentsManager {
      * else
      * return true
      */
-    public boolean isExistStudent(int studentId) {
+    public static boolean isExistStudent(int studentId,MyDBApp app) {
         String sql = "SELECT * from Student WHERE studentid = '" + studentId + "';";
-        return !app.selectToString(sql).equals("empty");
+        if (!app.selectToString(sql).equals("empty")){
+            return true;
+        }
+        System.err.println("student id : "+studentId+" does not exist ! ");
+        return false;
     }
 
     /**
@@ -184,6 +191,14 @@ public class StudentsManager {
             return true;
         }
         System.err.println("invalid date of birth !");
+        return false;
+    }
+
+    public boolean isValidStudentId(int studentId) {
+        if (studentId >= 0) {
+            return true;
+        }
+        System.err.println("studentid can not smaller than 0");
         return false;
     }
 }

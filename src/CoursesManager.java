@@ -28,9 +28,12 @@ public class CoursesManager {
      */
     public boolean addCourse(String courseId,String name, String prerequisites){
         if (isValidCourseId(courseId) && isValidname(name) && isValidPrerequisites(prerequisites)){
-            if (!isExistCourse(courseId)){
+            if (!isExistCourse(courseId,app)){
                 String sql = String.format("INSERT INTO Course VALUES ('%s','%s','%s');",courseId,name,prerequisites);
                 return app.insert(sql);
+            } else {
+                System.err.println("Course with id :" + courseId + " existed !");
+                return false;
             }
         }
         return false;
@@ -98,9 +101,14 @@ public class CoursesManager {
      * else
      * return true
      */
-    public boolean isExistCourse(String courseId){
+    public static boolean isExistCourse(String courseId,MyDBApp app){
         String sql = "SELECT * from Course WHERE courseid = '" + courseId + "';";
-        return !app.selectToString(sql).equals("empty");
+        if (!app.selectToString(sql).equals("empty")){
+            return true;
+        }
+        System.err.println("course id : "+courseId+" does not exist!");
+       return false;
+
     }
 
     /**
@@ -175,7 +183,7 @@ public class CoursesManager {
      * using selectToString from MyDBApp to get prerequisites.
      */
     public String getPrerequisites(String courseId){
-        if (!isExistCourse(courseId)){
+        if (!isExistCourse(courseId,app)){
             return "_";
         }
         String sql = "SELECT prerequisites FROM Course WHERE courseid = '"+courseId+"';";

@@ -8,7 +8,7 @@ import java.io.IOException;
  * app : MyDBApp.
  */
 public class EnrolmentManager {
-    MyDBApp app ;
+    MyDBApp app;
 
     /**
      * @effect :
@@ -21,6 +21,7 @@ public class EnrolmentManager {
     /**
      * @effect : add a enrolment into database.
      * if student id, course id, semester, final grade are valid
+     * if student id is exist and course id is exist
      * if enrolment is not exist in database
      * if student is eligible to enrol
      * using method insert in MyDBApp
@@ -28,12 +29,17 @@ public class EnrolmentManager {
      * else
      * return false
      */
-    public boolean addEnrolment(int studentId, String courseId, int semester, String finalGrade){
-        if(isValidStudentId(studentId) && isValidCourseId(courseId) && isValidSemester(semester) && isValidFinalGrade(finalGrade)){
-            if (!isExistEnrolment(studentId,courseId)){
-                if (isEligibleToEnrol(studentId,courseId)) {
-                    String sql = String.format("INSERT INTO Enrolment VALUES (%d,'%s', %d,'%s');", studentId, courseId, semester, finalGrade);
-                    return app.insert(sql);
+    public boolean addEnrolment(int studentId, String courseId, int semester, String finalGrade) {
+        if (isValidStudentId(studentId) && isValidCourseId(courseId) && isValidSemester(semester) && isValidFinalGrade(finalGrade)) {
+            if (StudentsManager.isExistStudent(studentId, app) && CoursesManager.isExistCourse(courseId, app)) {
+                if (!isExistEnrolment(studentId, courseId)) {
+                    if (isEligibleToEnrol(studentId, courseId)) {
+                        String sql = String.format("INSERT INTO Enrolment VALUES (%d,'%s', %d,'%s');", studentId, courseId, semester, finalGrade);
+                        return app.insert(sql);
+                    }
+                } else {
+                    System.err.println("Enrolment with studentId :" + studentId + " , courseID : " + courseId + " existed !");
+                    return false;
                 }
             }
         }
@@ -48,11 +54,11 @@ public class EnrolmentManager {
      * else
      * return false
      */
-    public boolean updateFinalGrade(int studentID, String courseID, String finalGrade){
-        if (isValidStudentId(studentID) && isValidCourseId(courseID) && isValidFinalGrade(finalGrade)){
+    public boolean updateFinalGrade(int studentID, String courseID, String finalGrade) {
+        if (isValidStudentId(studentID) && isValidCourseId(courseID) && isValidFinalGrade(finalGrade)) {
             String sql = String.format("UPDATE Enrolment \n" +
                     "SET finalgrade = '%s' \n" +
-                    "WHERE student = %d AND course = '%s';",finalGrade,studentID,courseID);
+                    "WHERE student = %d AND course = '%s';", finalGrade, studentID, courseID);
             return app.update(sql);
         }
         return false;
@@ -61,7 +67,7 @@ public class EnrolmentManager {
     /**
      * @effect : write to HTML file present information of all enrolment.
      */
-    public boolean enrolmentToHTML(){
+    public boolean enrolmentToHTML() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("enrols.html"))) {
             bufferedWriter.write(app.selectToHtml("SELECT* fROM Enrolment"));
             return true;
@@ -74,7 +80,7 @@ public class EnrolmentManager {
     /**
      * @effect : write to HTML file present information of all enrolment sorted by descending order.
      */
-    public boolean enrolmentSortedToHTML(){
+    public boolean enrolmentSortedToHTML() {
         String sql = "SELECT * " +
                 "FROM Enrolment " +
                 "ORDER BY " +
@@ -83,7 +89,7 @@ public class EnrolmentManager {
                 "   WHEN  'G' THEN 2 " +
                 "   WHEN  'P' THEN 3 " +
                 "   WHEN  'F' THEN 4 " +
-                "   ELSE 5"+
+                "   ELSE 5" +
                 "   END";
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("enrols_sorted.html"))) {
             bufferedWriter.write(app.selectToHtml(sql));
@@ -97,40 +103,28 @@ public class EnrolmentManager {
     /**
      * @return a String represent information of enrolment with studentId and courseId
      */
-    public String enrolmentToString(int studentID, String courseID){
-        String sql = String.format("SELECT* FROM Enrolment WHERE student = %d AND course = %s ;",studentID,courseID);
+    public String enrolmentToString(int studentID, String courseID) {
+        String sql = String.format("SELECT* FROM Enrolment WHERE student = %d AND course = %s ;", studentID, courseID);
         return app.selectToString(sql);
     }
 
     /**
      * @effect : check exist enrolment with studentId and courseId.
      */
-    public boolean isExistEnrolment(int studentID, String courseID){
-        String sql = String.format("SELECT* FROM Enrolment WHERE student = %d AND course = '%s';",studentID,courseID);
-        return !app.selectToString(sql).equals("empty");
-    }
-
-    /**
-     * @effect : check exist studentid in enrolment
-     */
-    public boolean isExistStudent(int studentId) {
-        String sql = "SELECT * from Enrolment WHERE student = '" + studentId + "';";
-        return !app.selectToString(sql).equals("empty");
-    }
-
-    /**
-     * @effect : check exist courseid in enrolment
-     */
-    public boolean isExistCourse(String courseId){
-        String sql = "SELECT * from Enrolment WHERE course = '" + courseId + "';";
-        return !app.selectToString(sql).equals("empty");
+    public boolean isExistEnrolment(int studentID, String courseID) {
+        String sql = String.format("SELECT* FROM Enrolment WHERE student = %d AND course = '%s';", studentID, courseID);
+        if (!app.selectToString(sql).equals("empty")){
+            return true;
+        }
+        System.err.println("Enrolment with studentId :" + studentID + " , courseID : " + courseID + " does not exist !");
+        return false;
     }
 
     /**
      * @return String present menu of manage enrolment.
      */
-    public String menu(){
-        return  "*-----------------------MANAGE ENROLMENT------------------------*\n" +
+    public String menu() {
+        return "*-----------------------MANAGE ENROLMENT------------------------*\n" +
                 "* Enter your choice                                             *\n" +
                 "*1. Add a new enrolment                                         *\n" +
                 "*2. Enter grade for a student's enrolment                       *\n" +
@@ -142,15 +136,15 @@ public class EnrolmentManager {
     }
 
     /**
-     *@effect : validate studentid
+     * @effect : validate studentid
      * if studentid > 0
-     *      return true
-     *      else
-     *      print err message
-     *      return false
+     * return true
+     * else
+     * print err message
+     * return false
      */
-    public boolean isValidStudentId(int studentId){
-        if (studentId >= 0){
+    public boolean isValidStudentId(int studentId) {
+        if (studentId >= 0) {
             return true;
         }
         System.err.println("studentid can not smaller than 0");
@@ -158,14 +152,14 @@ public class EnrolmentManager {
     }
 
     /**
-     *@effect : validate courseid
+     * @effect : validate courseid
      * if courseid != null /\ 0 < courseid,length < 5
-     *      return true
-     *      else
-     *      print err message
-     *      return false
+     * return true
+     * else
+     * print err message
+     * return false
      */
-    public boolean isValidCourseId(String courseID){
+    public boolean isValidCourseId(String courseID) {
         if (courseID != null && courseID.length() > 0 && courseID.length() <= 5) {
             return true;
         }
@@ -174,15 +168,15 @@ public class EnrolmentManager {
     }
 
     /**
-     *@effect : validate semester
+     * @effect : validate semester
      * if 1 <= semester <= 8
-     *      return true
-     *      else
-     *      print err message
-     *      return false
+     * return true
+     * else
+     * print err message
+     * return false
      */
-    public boolean isValidSemester(int semester){
-        if (semester >=1 && semester <= 8){
+    public boolean isValidSemester(int semester) {
+        if (semester >= 1 && semester <= 8) {
             return true;
         }
         System.err.println("semester must from 1 - 8");
@@ -190,15 +184,15 @@ public class EnrolmentManager {
     }
 
     /**
-     *@effect : validate finalGrade
+     * @effect : validate finalGrade
      * if finalGrade is one of 'E','G','P','F' and '_'
-     *      return true
-     *      else
-     *      print err message
-     *      return false
+     * return true
+     * else
+     * print err message
+     * return false
      */
-    public boolean isValidFinalGrade(String finalGrade){
-        if (finalGrade.equals("E") || finalGrade.equals("G") || finalGrade.equals("P") || finalGrade.equals("F") || finalGrade.equals("_")){
+    public boolean isValidFinalGrade(String finalGrade) {
+        if (finalGrade.equals("E") || finalGrade.equals("G") || finalGrade.equals("P") || finalGrade.equals("F") || finalGrade.equals("_")) {
             return true;
         }
         System.err.println("invalid final grade");
@@ -206,26 +200,19 @@ public class EnrolmentManager {
     }
 
     /**
-     *@effect : check eligible to enrol
-     *  if exist courseid
-     *      get prerequisites
-     *      get list course enroled with studentid
-     *      if prerequisites is one of element in listCourse
-     *      return true
-     *      else print err message
-     *      return false.
+     * @effect : check eligible to enrol
+     * if exist courseid
+     * get prerequisites
+     * if exist enrolment with studentid and course = prequisites
+     * return true
+     * else print err message
+     * return false.
      */
-    public boolean isEligibleToEnrol(int studentID,String courseId){
-        if ( !app.selectToString("SELECT * from Course WHERE courseid = '" + courseId + "';").equals("empty")){
-            String prerequisites = app.selectToString( "SELECT prerequisites FROM Course WHERE courseid = '"+courseId+"';");
-
-            String sql = "SELECT course FROM Enrolment WHERE student = '"+studentID+"' AND finalgrade != 'F'";
-            String[] listCourse = app.selectToString(sql).split(",");
-            for (String course : listCourse) {
-                if (course.equals(prerequisites)){
-                    return true;
-                }
-            }
+    public boolean isEligibleToEnrol(int studentID, String courseId) {
+        // get  prerequisites
+        String prerequisites = app.selectToString("SELECT prerequisites FROM Course WHERE courseid = '" + courseId + "';");
+        if (isExistEnrolment(studentID,prerequisites)){
+            return true;
         }
         System.err.println("not eligible to enrol!");
         return false;
