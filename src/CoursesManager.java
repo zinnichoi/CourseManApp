@@ -3,6 +3,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
+ *  * author : Nguyễn Mạnh Tiến 3c14 hanu.
  * @overview : a class manage course in database.
  * @attribute :
  *     app  : MyDBApp

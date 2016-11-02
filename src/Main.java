@@ -1,4 +1,6 @@
-
+/**
+ * author : Nguyễn Mạnh Tiến 3c14 hanu.
+ */
 
 import java.util.Scanner;
 
