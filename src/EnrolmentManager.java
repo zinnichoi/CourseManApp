@@ -1,4 +1,5 @@
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -39,9 +40,11 @@ public class EnrolmentManager {
                         return app.insert(sql);
                     }
                 } else {
-                    System.err.println("Enrolment with studentId :" + studentId + " , courseID : " + courseId + " existed !");
+                    TextIO.putln("Enrolment with studentId :" + studentId + " , courseID : " + courseId + " existed !");
                     return false;
                 }
+            }else {
+                TextIO.putln("Studentid or courseid existed");
             }
         }
         return false;
@@ -69,8 +72,10 @@ public class EnrolmentManager {
      * @effect : write to HTML file present information of all enrolment.
      */
     public boolean enrolmentToHTML() {
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("enrols.html"))) {
+        File file = new File("enrols.html");
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
             bufferedWriter.write(app.selectToHtml("SELECT* fROM Enrolment"));
+            TextIO.putln("Writed to : "+file.getAbsolutePath());
             return true;
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -82,6 +87,7 @@ public class EnrolmentManager {
      * @effect : write to HTML file present information of all enrolment sorted by descending order.
      */
     public boolean enrolmentSortedToHTML() {
+        File file = new File("enrols_sorted.html");
         String sql = "SELECT * " +
                 "FROM Enrolment " +
                 "ORDER BY " +
@@ -92,8 +98,9 @@ public class EnrolmentManager {
                 "   WHEN  'F' THEN 4 " +
                 "   ELSE 5" +
                 "   END";
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("enrols_sorted.html"))) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
             bufferedWriter.write(app.selectToHtml(sql));
+            TextIO.putln("Writed to "+file.getAbsolutePath());
             return true;
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -105,7 +112,7 @@ public class EnrolmentManager {
      * @return a String represent information of enrolment with studentId and courseId
      */
     public String enrolmentToString(int studentID, String courseID) {
-        String sql = String.format("SELECT* FROM Enrolment WHERE student = %d AND course = %s ;", studentID, courseID);
+        String sql = String.format("SELECT* FROM Enrolment WHERE student = %d AND course = '%s' ;", studentID, courseID);
         return app.selectToString(sql);
     }
 
@@ -117,7 +124,6 @@ public class EnrolmentManager {
         if (!app.selectToString(sql).equals("empty")){
             return true;
         }
-        System.err.println("Enrolment with studentId :" + studentID + " , courseID : " + courseID + " does not exist !");
         return false;
     }
 
@@ -148,7 +154,7 @@ public class EnrolmentManager {
         if (studentId >= 0) {
             return true;
         }
-        System.err.println("studentid can not smaller than 0");
+        TextIO.putln("studentid can not smaller than 0");
         return false;
     }
 
@@ -164,7 +170,7 @@ public class EnrolmentManager {
         if (courseID != null && courseID.length() > 0 && courseID.length() <= 5) {
             return true;
         }
-        System.err.println("invalid last name!");
+        TextIO.putln("invalid last name!");
         return false;
     }
 
@@ -180,7 +186,7 @@ public class EnrolmentManager {
         if (semester >= 1 && semester <= 8) {
             return true;
         }
-        System.err.println("semester must from 1 - 8");
+        TextIO.putln("semester must from 1 - 8");
         return false;
     }
 
@@ -196,7 +202,7 @@ public class EnrolmentManager {
         if (finalGrade.equals("E") || finalGrade.equals("G") || finalGrade.equals("P") || finalGrade.equals("F") || finalGrade.equals("_")) {
             return true;
         }
-        System.err.println("invalid final grade");
+        TextIO.putln("invalid final grade");
         return false;
     }
 
@@ -211,11 +217,14 @@ public class EnrolmentManager {
      */
     public boolean isEligibleToEnrol(int studentID, String courseId) {
         // get  prerequisites
-        String prerequisites = app.selectToString("SELECT prerequisites FROM Course WHERE courseid = '" + courseId + "';");
+        String prerequisites = app.selectToString("SELECT prerequisites FROM Course WHERE courseid = '" + courseId + "';").substring(0,3);
         if (isExistEnrolment(studentID,prerequisites)){
             return true;
         }
-        System.err.println("not eligible to enrol!");
+        if (prerequisites.equals("-")){
+            return true;
+        }
+        TextIO.putln("not eligible to enrol!");
         return false;
     }
 }

@@ -1,4 +1,5 @@
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -33,7 +34,7 @@ public class CoursesManager {
                 String sql = String.format("INSERT INTO Course VALUES ('%s','%s','%s');",courseId,name,prerequisites);
                 return app.insert(sql);
             } else {
-                System.err.println("Course with id :" + courseId + " existed !");
+                TextIO.putln("Course with id :" + courseId + " existed !");
                 return false;
             }
         }
@@ -68,8 +69,13 @@ public class CoursesManager {
      */
     public boolean deleteCourse(String courseId){
         if (isValidCourseId(courseId) && isValidCourseId(courseId)){
-            String sql = String.format("DELETE FROM Course WHERE courseid ='%s';", courseId);
-            return app.delete(sql);
+            if (isExistCourse(courseId,app)){
+                String sql = String.format("DELETE FROM Course WHERE courseid ='%s';", courseId);
+                return app.delete(sql);
+            }else {
+                TextIO.putln("Course with id : "+courseId+" does not exist");
+                return false;
+            }
         }
         return false;
     }
@@ -78,8 +84,10 @@ public class CoursesManager {
      * @effect : write to HTML file present information of all course.
      */
     public boolean courseToHTML() {
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("courses.html"))) {
+        File file = new File("courses.html");
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
             bufferedWriter.write(app.selectToHtml("SELECT* fROM Course"));
+            System.out.println("Write to "+file.getAbsolutePath());
             return true;
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -104,11 +112,7 @@ public class CoursesManager {
      */
     public static boolean isExistCourse(String courseId,MyDBApp app){
         String sql = "SELECT * from Course WHERE courseid = '" + courseId + "';";
-        if (!app.selectToString(sql).equals("empty")){
-            return true;
-        }
-        System.err.println("course id : "+courseId+" does not exist!");
-       return false;
+        return !app.selectToString(sql).equals("empty");
 
     }
 
@@ -140,7 +144,7 @@ public class CoursesManager {
         if (courseId != null && courseId.length() > 0 && courseId.length() <= 5){
             return true;
         }
-        System.err.println("invalid course id!");
+        TextIO.putln("invalid course id!");
         return false;
     }
 
@@ -172,7 +176,7 @@ public class CoursesManager {
         if (prerequisites != null && prerequisites.length() > 0 && prerequisites.length() <= 250 || prerequisites.equals("_")){
             return true;
         }
-        System.err.println("invalid prerequisites!");
+        TextIO.putln("invalid prerequisites!");
         return false;
     }
 

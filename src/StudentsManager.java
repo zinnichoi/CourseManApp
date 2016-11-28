@@ -1,4 +1,5 @@
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -36,12 +37,13 @@ public class StudentsManager {
                 String sql = String.format("INSERT INTO Student VALUES (%d,'%s','%s','%s','%s');", studentID, firstName, lastName, address, dob);
                 return app.insert(sql);
             } else {
-                System.err.println("Student id existed !");
+                TextIO.putln("Student id existed !");
                 return false;
             }
         }
         return false;
     }
+
 
     /**
      * @effect : edit a student information from database
@@ -81,8 +83,10 @@ public class StudentsManager {
      * @effect : write to a HTML file present information of all student.
      */
     public boolean studentToHTML() {
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("students.html"))) {
+        File file = new File("students.html");
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
             bufferedWriter.write(app.selectToHtml("SELECT* fROM Student"));
+            TextIO.putln("Write to : "+file.getAbsolutePath());
             return true;
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -109,11 +113,18 @@ public class StudentsManager {
      */
     public static boolean isExistStudent(int studentId,MyDBApp app) {
         String sql = "SELECT * from Student WHERE studentid = '" + studentId + "';";
-        if (!app.selectToString(sql).equals("empty")){
+        return !app.selectToString(sql).equals("empty");
+    }
+
+    //
+    public boolean validateStudentId(int studentId) {
+        String sql = "SELECT* FROM Student WHERE studentid = " + studentId + ";";
+        String result = app.selectToString(sql);
+
+        if (result.equals("")) {
+            return false;
+        } else
             return true;
-        }
-        System.err.println("student id : "+studentId+" does not exist ! ");
-        return false;
     }
 
     /**
@@ -144,7 +155,7 @@ public class StudentsManager {
         if (firstName != null && firstName.length() > 0 && firstName.length() <= 50) {
             return true;
         }
-        System.err.println("invalid first name!");
+        TextIO.putln("invalid first name!");
         return false;
     }
 
@@ -160,7 +171,7 @@ public class StudentsManager {
         if (lastName != null && lastName.length() > 0 && lastName.length() <= 50) {
             return true;
         }
-        System.err.println("invalid last name!");
+        TextIO.putln("invalid last name!");
         return false;
     }
 
@@ -176,7 +187,7 @@ public class StudentsManager {
         if (address != null && address.length() > 0 && address.length() <= 250) {
             return true;
         }
-        System.err.println("invalid address !");
+        TextIO.putln("invalid address !");
         return false;
     }
 
@@ -192,7 +203,7 @@ public class StudentsManager {
         if (dob != null && dob.length() > 0 && dob.length() < 30) {
             return true;
         }
-        System.err.println("invalid date of birth !");
+        TextIO.putln("invalid date of birth !");
         return false;
     }
 
@@ -200,7 +211,7 @@ public class StudentsManager {
         if (studentId >= 0) {
             return true;
         }
-        System.err.println("studentid can not smaller than 0");
+        TextIO.putln("studentid can not smaller than 0");
         return false;
     }
 }
