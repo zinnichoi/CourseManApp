@@ -160,35 +160,15 @@ public class MyDBApp {
      * @effects Return a string containing a sequence of rows of <tt>rs</tt>, one per line,
      * or return <tt>empty</tt> if no rows are found.
      */
-//    private String resultSetToString(ResultSet resultSet) throws SQLException {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        //number of column
-//        int columnCount = resultSet.getMetaData().getColumnCount();
-//        int size = 0;
-//        while (resultSet.next()) {
-//            size++;
-//            for (int i = 0; i < columnCount; ) {
-//                stringBuilder.append(resultSet.getString(i + 1));
-//                if (++i < columnCount) stringBuilder.append(",");
-//            }
-//            stringBuilder.append("\r\n");
-//        }
-//
-//        if (size == 0) {
-//            return "empty";
-//        }
-//        return stringBuilder.toString();
-//    }
-
-    private String resultSetToString(ResultSet rs) throws SQLException {
+    private String resultSetToString(ResultSet resultSet) throws SQLException {
         StringBuilder stringBuilder = new StringBuilder();
         //number of column
-        int columnCount = rs.getMetaData().getColumnCount();
+        int columnCount = resultSet.getMetaData().getColumnCount();
         int size = 0;
-        while (rs.next()) {
+        while (resultSet.next()) {
             size++;
             for (int i = 0; i < columnCount; ) {
-                stringBuilder.append(rs.getString(i + 1));
+                stringBuilder.append(resultSet.getString(i + 1));
                 if (++i < columnCount) stringBuilder.append(",");
             }
             stringBuilder.append("\r\n");
@@ -199,6 +179,10 @@ public class MyDBApp {
         }
         return stringBuilder.toString();
     }
+
+
+
+
 
     /**
      * @effects Return an Html table string containing a

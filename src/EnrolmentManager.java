@@ -44,7 +44,7 @@ public class EnrolmentManager {
                     return false;
                 }
             }else {
-                TextIO.putln("Studentid or courseid existed");
+                TextIO.putln("Studentid or courseid does not existed");
             }
         }
         return false;
@@ -221,7 +221,7 @@ public class EnrolmentManager {
         if (isExistEnrolment(studentID,prerequisites)){
             return true;
         }
-        if (prerequisites.equals("-")){
+        if (prerequisites.contains("-")){
             return true;
         }
         TextIO.putln("not eligible to enrol!");

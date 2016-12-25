@@ -25,7 +25,7 @@ public class Report {
     public boolean myEnrols(int studentId){
         File file = new File("my_enrols.html");
         if (StudentsManager.isExistStudent(studentId,app)){
-            String sql = "SELECT student.studentid, student.firstname, student.lastname, course.courseid, course.name , finalgrade FROM student JOIN enrolment ON student.studentid = enrolment.student JOIN course ON course.courseid = enrolment.course WHERE student.studentid = "+studentId+";";
+            String sql = "SELECT course.courseid, course.name , finalgrade FROM student JOIN enrolment ON student.studentid = enrolment.student JOIN course ON course.courseid = enrolment.course WHERE student.studentid = "+studentId+";";
 
             try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))){
                 bufferedWriter.write(app.selectToHtml(sql));
@@ -49,7 +49,7 @@ public class Report {
     public boolean courseEnrol(String courseId){
         File file = new File("course_enrols.html");
         if (CoursesManager.isExistCourse(courseId,app)){
-            String sql = "SELECT student.studentid, student.firstname, student.lastname, course.courseid, course.name , finalgrade FROM student JOIN enrolment ON student.studentid = enrolment.student JOIN course ON course.courseid = enrolment.course WHERE course.courseid ='" + courseId + "';";
+            String sql = "SELECT student.studentid, student.firstname, student.lastname, finalgrade FROM student JOIN enrolment ON student.studentid = enrolment.student JOIN course ON course.courseid = enrolment.course WHERE course.courseid ='" + courseId + "';";
             try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))){
                 bufferedWriter.write(app.selectToHtml(sql));
                 TextIO.putln("Writed to "+file.getAbsolutePath());
